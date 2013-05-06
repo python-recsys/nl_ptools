@@ -3,6 +3,7 @@ import re
 import sys
 from base import BaseTokenizer
 from extractors.utils import asciize
+from nltk.tokenize import sent_tokenize
 
 
 class TokenizerException(Exception):
@@ -81,6 +82,10 @@ def retweet_(scanner, token):
     return "RT", token
 
 
+def paragraph(scanner,  token):
+    return 'PARAGRAPH', token
+
+
 def half_word_(scanner, token):
     '''
     "Half" words are words at the end of tweets that
@@ -133,3 +138,25 @@ class SocialTokenizer(BaseTokenizer):
                     for token  in tokens]
         return tokens
 
+
+class ParagraphTokenizer(BaseTokenizer):
+
+    @classmethod
+    def tokenize(cls, text, ascii=False):
+        tokens = re.split(r"[ \t\r\f\v]*\n[ \t\r\f\v]*\n[ \t\r\f\v]*", text,
+            re.UNICODE)
+
+        tokens = [token if not ascii else asciize(token[1]) \
+                    for token  in tokens]
+        return tokens
+
+
+class SentenceTokenizer(BaseTokenizer):
+
+    @classmethod
+    def tokenize(cls, text, ascii=False):
+        tokens = sent_tokenize(text)
+
+        tokens = [token if not ascii else asciize(token[1]) \
+                    for token  in tokens]
+        return tokens
